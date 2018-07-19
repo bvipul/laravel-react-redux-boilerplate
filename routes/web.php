@@ -11,6 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/**
+ * SPA Route
+ */
+Route::view('/{path?}', 'app')->where(['path' => '.*']);
