@@ -11,6 +11,11 @@
 |
 */
 
+Route::group(['prefix' => 'ajax'], function() {
+    // all routes that don't need to go to react-router
+    Auth::routes();
+});
+
 /**
  * SPA Route
  */
