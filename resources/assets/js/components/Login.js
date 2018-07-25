@@ -1,46 +1,29 @@
 import React from 'react';
 import { reduxForm, Field } from 'redux-form';
+import FormField from './FormField';
 
-const FormField = ({
-        label,
-        input,
-        type,
-        name,
-        className,
-        meta: { touched, error, warning }
-}) => (
-    <div className="form-group">
-        {
-            label &&
-            <label htmlFor={name}>{label}</label>
-        }
-        <input {...input } name={name} type={type} className={
-            `${className} ${
-                touched && (
-                    (error && 'is-invalid')
-                )
-            }`
-        } />
-        {
-            touched &&
-                (error && <span className="invalid-feedback">{error}</span>)
-        }
-    </div>
-);
+const USER_LOGGED_IN = 'loggedIn';
+
+const userLoggedIn = (payload) => {
+    return {
+        type: USER_LOGGED_IN,
+        payload
+    };
+};
 
 const validatorSignInForm = (values) => {
     const result = validate(values, {
         email: {
             presence: {
-                message: '^Please enter your email address.'
+                message: 'Please enter your email address.'
             },
             email: {
-                message: '^Please enter a valid email address.'
+                message: 'Please enter a valid email address.'
             }
         },
         password: {
             presence: {
-                message: '^Please enter your password.'
+                message: 'Please enter your password.'
             }
         }
     });
@@ -48,8 +31,21 @@ const validatorSignInForm = (values) => {
     return result;
 };
 
-function validate(values) {
-    return true;
+function validate(values, messages) {
+    const errors = {};
+    
+    if (!values.email) {
+        errors.email = messages.email.presence.message;
+    } 
+    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+        errors.email = messages.email.email.message;
+    }
+
+    if(!values.password) {
+        errors.password = messages.password.presence.message;
+    }
+    
+    return errors;
 }
 
 class Login extends React.Component {
@@ -60,11 +56,10 @@ class Login extends React.Component {
     }
 
     componentWillMount() {
-        // do something like setting default state
+        
     }
 
     processSubmit(values) {
-        console.log("values", values);
         axios
         .post('/ajax/login', values)
         .then( (response) => {

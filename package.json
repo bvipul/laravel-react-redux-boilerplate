@@ -25,5 +25,9 @@
         "react-router-dom": "^4.2.2",
         "redux": "^4.0.0",
         "redux-form": "^7.4.2"
+    },
+    "dependencies": {
+        "imagemin-pngquant": "^5.0.1",
+        "pngquant-bin": "^3.1.1"
     }
 }
