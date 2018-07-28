@@ -1,15 +1,16 @@
 import React from 'react';
 import { reduxForm, Field } from 'redux-form';
+import { bindActionCreators } from 'redux';
+import {connect} from 'react-redux';
 import FormField from './FormField';
 
-const USER_LOGGED_IN = 'loggedIn';
-
-const userLoggedIn = (payload) => {
-    return {
-        type: USER_LOGGED_IN,
-        payload
-    };
-};
+function loggedIn(user, token) {
+  return {
+    type: 'LOGGED_IN',
+    user,
+    token
+  }
+}
 
 const validatorSignInForm = (values) => {
     const result = validate(values, {
@@ -48,6 +49,18 @@ function validate(values, messages) {
     return errors;
 }
 
+function mapStateToProps(state) {
+  return {
+    auth: state.auth
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({
+      loggedIn
+    }, dispatch);
+}
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -64,6 +77,7 @@ class Login extends React.Component {
         .post('/ajax/login', values)
         .then( (response) => {
             console.log(response.data);
+            this.props.loggedIn(response.data.user, 'qwerqwerqqewrqew');
         })
         .catch( (err) => {
             console.log(err);
@@ -114,5 +128,7 @@ Login = reduxForm({
     form: 'signin',
     validate: validatorSignInForm
 })(Login);
+
+Login = connect(mapStateToProps, mapDispatchToProps)(Login);
 
 export default Login;
