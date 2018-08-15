@@ -5,3 +5,6 @@ A Laravel Application Boilerplate with React and Redux
 
 # Login Page
 ![Screenshot](screenshots/login.png)
+
+# Dashboard
+![Screenshot](screenshots/dashboard.png)
