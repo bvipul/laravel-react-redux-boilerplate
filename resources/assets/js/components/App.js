@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-import { BrowserRouter, Route } from 'react-router-dom';
-import { createStore, combineReducers } from 'redux';
+import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { reducer as formReducer } from 'redux-form';
-import { Provider, connect } from 'react-redux';
+import { Provider } from 'react-redux';
 
 import LandingPage from './LandingPage';
 import Login from './Login';
@@ -13,13 +13,21 @@ import Dashboard from './Dashboard';
 import Header from './Header';
 
 function auth(state=[], action) {
-  console.log(state, action);
   switch(action.type) {
     case 'LOGGED_IN':
       return {
-        user: action.user,
-        token: action.token
+        user: action.payload
       };
+    default:
+      return state;
+  }
+}
+
+function errors(state=[], action) {
+  switch(action.type) {
+    case 'LOGIN_FAILED':
+      console.log("payload", action.payload);
+      return [...action.payload];
     default:
       return state;
   }
@@ -27,10 +35,25 @@ function auth(state=[], action) {
 
 const rootReducer = combineReducers({
   form: formReducer,
-  auth
+  auth,
+  errors
   // my other reducers come here
 });
 
+const isAuthenticated = () => {
+  return true;
+  if(store.getState().auth.hasOwnProperty('user')) return true;
+
+  return false;
+};
+
+const PrivateRoute = ({component: Component, ...rest}) => (
+  <Route {...rest} render={(props) => (
+  isAuthenticated() === true
+    ? <Component {...props} />
+    : <Redirect to='/login' />
+  )} />
+);
 
 const store = createStore(rootReducer, {});
 
@@ -43,12 +66,12 @@ class App extends Component {
     return (
       <Provider store={store}>
         <BrowserRouter>
-          <div>
-              <Header />
+          <div className="app">
+              {/* <Header /> */}
               <Route exact path="/" component={LandingPage} />
               <Route path="/login" component={Login} />
               <Route path="/account/create" component={Register} />
-              <Route path="/dashboard" component={Dashboard} />
+              <PrivateRoute path="/dashboard" component={Dashboard}/>
           </div>
         </BrowserRouter>
       </Provider>

@@ -1,15 +1,22 @@
 import React from 'react';
-import { reduxForm, Field } from 'redux-form';
+import { reduxForm, Field, SubmissionError } from 'redux-form';
 import { bindActionCreators } from 'redux';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import FormField from './FormField';
+import Errors from './Errors';
 
-function loggedIn(user, token) {
+function loggedIn(payload) {
   return {
     type: 'LOGGED_IN',
-    user,
-    token
+    payload
   }
+}
+
+function errors(payload) {
+    return {
+        type: 'LOGIN_FAILED',
+        payload
+    }
 }
 
 const validatorSignInForm = (values) => {
@@ -57,7 +64,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-      loggedIn
+      loggedIn,
+      errors
     }, dispatch);
 }
 
@@ -74,19 +82,23 @@ class Login extends React.Component {
 
     processSubmit(values) {
         axios
-        .post('/ajax/login', values)
+        .post('/api/login', values)
         .then( (response) => {
             console.log(response.data);
-            this.props.loggedIn(response.data.user, 'qwerqwerqqewrqew');
+            if (response.data.success) {
+                this.props.loggedIn(response.data.user);
+                this.props.history.push('/dashboard');
+            }
         })
-        .catch( (err) => {
-            console.log(err);
+        .catch( (error) => {
+            const {response: {data: { error: { message }}}} = error;
+            this.props.errors(new Array(message));
         });
     }
 
     render() {
-        const { handleSubmit, submitting } = this.props;
-
+        const { error, handleSubmit, submitting } = this.props;
+        console.log("errreadfdsaf", error)
         return (
             <div className="container mt-5">
                 <div className="row justify-content-center">
@@ -94,6 +106,7 @@ class Login extends React.Component {
                         <div className="card">
                             <div className="card-body">
                             <h2 className="text-center font-weight-light mb-4">Sign into your account</h2>
+                                <Errors />
                                 <form onSubmit={handleSubmit(this.processSubmit)}>
                                     <Field
                                         label="Email Address"
@@ -113,6 +126,9 @@ class Login extends React.Component {
                                     <div className="form-group mt-4">
                                         <button type="submit" className="btn btn-secondary" disabled={submitting}>Continue</button>
                                     </div>
+                                    {
+                                        error && <strong>{error}</strong>
+                                    }
                                 </form>
                             </div>
                         </div>
