@@ -36,11 +36,12 @@ class LoginController extends ApiController
         } catch (JWTException $e) {
             return $this->respondInternalError($e->getMessage());
         }
-
+        
         return $this->respond([
             'success'   => true,
             'message'   => "Login Successful",
             'token'     => $token,
+            'user'      => \Auth::user()->toArray()
         ]);
     }
 

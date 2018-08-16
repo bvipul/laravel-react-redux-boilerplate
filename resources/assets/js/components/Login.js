@@ -3,7 +3,9 @@ import { reduxForm, Field, SubmissionError } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import FormField from './FormField';
-import Errors from './Errors';
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import client from '../Helpers/Server';
+
 
 function loggedIn(payload) {
   return {
@@ -81,12 +83,16 @@ class Login extends React.Component {
     }
 
     processSubmit(values) {
-        axios
+        client
         .post('/api/login', values)
         .then( (response) => {
-            console.log(response.data);
             if (response.data.success) {
+                
                 this.props.loggedIn(response.data.user);
+                
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', response.data.user);
+                
                 this.props.history.push('/dashboard');
             }
         })
@@ -98,42 +104,43 @@ class Login extends React.Component {
 
     render() {
         const { error, handleSubmit, submitting } = this.props;
-        console.log("errreadfdsaf", error)
+
         return (
-            <div className="container mt-5">
-                <div className="row justify-content-center">
-                    <div className="col-6">
-                        <div className="card">
-                            <div className="card-body">
-                            <h2 className="text-center font-weight-light mb-4">Sign into your account</h2>
-                                <Errors />
-                                <form onSubmit={handleSubmit(this.processSubmit)}>
-                                    <Field
-                                        label="Email Address"
-                                        name="email"
-                                        component={FormField}
-                                        id="email"
-                                        type="text"
-                                        className="form-control"
-                                    />
-                                    <Field label="Password" name="password" component={FormField} id="password" type="password" className="form-control" />
-                                    <div className="form-check">
-                                        <label className="form-check-label">
-                                            <Field name="remember" component="input" type="checkbox" className="form-check-input mt-2" value="1" />
-                                            Remember me
-                                        </label>
-                                    </div>
-                                    <div className="form-group mt-4">
-                                        <button type="submit" className="btn btn-secondary" disabled={submitting}>Continue</button>
-                                    </div>
-                                    {
-                                        error && <strong>{error}</strong>
-                                    }
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="app flex-row align-items-center">
+                <Container>
+                    <Row className="justify-content-center">
+                        <Col md="8">
+                            <CardGroup>
+                                <Card className="p-4">
+                                    <CardBody>
+                                        <Form onSubmit={handleSubmit(this.processSubmit)}>
+                                            <h1>Login</h1>
+                                            <p className="text-muted">Sign In to your account</p>
+                                            <Field
+                                                label="Email Address"
+                                                name="email"
+                                                component={FormField}
+                                                id="email"
+                                                type="text"
+                                                className="form-control"
+                                            />
+                                            <Field label="Password" name="password" component={FormField} id="password" type="password" className="form-control" />
+                                            <div className="form-check">
+                                                <label className="form-check-label">
+                                                    <Field name="remember" component="input" type="checkbox" className="form-check-input mt-2" value="1" />
+                                                    Remember me
+                                                </label>
+                                            </div>
+                                            <div className="form-group mt-4">
+                                                <Button type="submit" color="primary" disabled={submitting}>Login</Button>
+                                            </div>
+                                        </Form>
+                                    </CardBody>
+                                </Card>
+                            </CardGroup>
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         );
     }

@@ -10,6 +10,9 @@
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
         <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+        <script>
+            window.Laravel = {!! json_encode([ 'csrfToken' => csrf_token() ]) !!};
+        </script>
     </head>
     <body>
         <div id="app"></div>

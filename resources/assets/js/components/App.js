@@ -9,8 +9,22 @@ import { Provider } from 'react-redux';
 import LandingPage from './LandingPage';
 import Login from './Login';
 import Register from './Register';
-import Dashboard from './Dashboard';
-import Header from './Header';
+import BackendLayout from '../Layout/BackendLayout';
+import Errors from './Errors';
+import jwt_decode from 'jwt-decode';
+
+// import './App.css';
+// Styles
+// CoreUI Icons Set
+import '@coreui/icons/css/coreui-icons.min.css';
+// Import Flag Icons Set
+import 'flag-icon-css/css/flag-icon.min.css';
+// Import Font Awesome Icons Set
+import 'font-awesome/css/font-awesome.min.css';
+// Import Simple Line Icons Set
+import 'simple-line-icons/css/simple-line-icons.css';
+// Import Main styles for this application
+import '../scss/style.css';
 
 function auth(state=[], action) {
   switch(action.type) {
@@ -41,8 +55,17 @@ const rootReducer = combineReducers({
 });
 
 const isAuthenticated = () => {
-  return true;
-  if(store.getState().auth.hasOwnProperty('user')) return true;
+  
+  if(localStorage.getItem('token'))
+  {
+    let token = jwt_decode(localStorage.getItem('token'));
+
+    if (token.exp > (new Date().getTime() / 1000))
+    {
+      return true;
+    }
+    console.log("has token", token);
+  }
 
   return false;
 };
@@ -67,11 +90,11 @@ class App extends Component {
       <Provider store={store}>
         <BrowserRouter>
           <div className="app">
-              {/* <Header /> */}
+              <Errors />
               <Route exact path="/" component={LandingPage} />
               <Route path="/login" component={Login} />
               <Route path="/account/create" component={Register} />
-              <PrivateRoute path="/dashboard" component={Dashboard}/>
+              <PrivateRoute path="/dashboard" component={BackendLayout}/>
           </div>
         </BrowserRouter>
       </Provider>
