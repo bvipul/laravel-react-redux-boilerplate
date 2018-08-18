@@ -1,22 +1,25 @@
-const axios = require('axios');
+import axios from 'axios';
+import store from '../store';
+import * as actions from '../store/actions';
 
-let headers = {};
+let token = document.head.querySelector('meta[name="csrf-token"]');
 
-const token = localStorage.getItem('token');
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 
-if (token) {
-    headers['Authorization'] = 'Bearer ' + token;
+if(localStorage.getItem('jwt_token')) {
+  const jwtToken = localStorage.getItem('jwt_token');
+  axios.defaults.headers.common['Authorization'] = `Bearer ${jwtToken}`;
 }
 
-let csrf_token = document.head.querySelector('meta[name="csrf-token"]');
+axios.interceptors.response.use(
+  response => response,
+  (error) => {
+    if (error.response.status === 401) {
+      store.dispatch(actions.authLogout())
+    }
+    return Promise.reject(error);
+  }
+);
 
-if (csrf_token) {
-    headers['X-CSRF-TOKEN'] = csrf_token.content;
-} else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
-
-
-let client = axios.create({ headers });
-
-export default client;
+export default axios;

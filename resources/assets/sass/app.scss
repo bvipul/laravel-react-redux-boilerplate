@@ -7,8 +7,11 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
-
-.navbar-laravel {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
+// Import styles
+@import "node_modules/@coreui/coreui/scss/coreui.scss";
+// Temp fix for reactstrap
+@import 'node_modules/@coreui/coreui/scss/_dropdown-menu-right.scss';
+// If you want to add something do it here
+@import "custom";
+// ie fixes
+@import "ie-fix";

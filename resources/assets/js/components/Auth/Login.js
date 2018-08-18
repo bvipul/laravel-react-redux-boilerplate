@@ -1,25 +1,11 @@
 import React from 'react';
-import { reduxForm, Field, SubmissionError } from 'redux-form';
+import { reduxForm, Field } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import FormField from './FormField';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
-import client from '../Helpers/Server';
-
-
-function loggedIn(payload) {
-  return {
-    type: 'LOGGED_IN',
-    payload
-  }
-}
-
-function errors(payload) {
-    return {
-        type: 'LOGIN_FAILED',
-        payload
-    }
-}
+import FormField from '../FormField';
+import { Button, Card, CardBody, CardGroup, Col, Container, Form, Row } from 'reactstrap';
+import Server from '../../Helpers/Server';
+import { authLogin, errors } from '../../store/actions';
 
 const validatorSignInForm = (values) => {
     const result = validate(values, {
@@ -66,7 +52,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-      loggedIn,
+      authLogin,
       errors
     }, dispatch);
 }
@@ -83,17 +69,13 @@ class Login extends React.Component {
     }
 
     processSubmit(values) {
-        client
+        Server
         .post('/api/login', values)
         .then( (response) => {
             if (response.data.success) {
-                
-                this.props.loggedIn(response.data.user);
-                
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', response.data.user);
-                
-                this.props.history.push('/dashboard');
+                this.props.authLogin(response.data);
+                this.props.errors(new Array());
+                this.props.history.push('/admin/dashboard');
             }
         })
         .catch( (error) => {
@@ -150,8 +132,6 @@ class Login extends React.Component {
 Login = reduxForm({
     form: 'signin',
     validate: validatorSignInForm
-})(Login);
-
-Login = connect(mapStateToProps, mapDispatchToProps)(Login);
+})(connect(mapStateToProps, mapDispatchToProps)(Login));
 
 export default Login;

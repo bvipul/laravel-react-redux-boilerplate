@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { 
     AppBreadcrumb,
     AppAside,
@@ -19,7 +19,7 @@ import Footer from './Footer';
 import { Container } from 'reactstrap';
 
 import navigation from '../_nav';
-import routes from '../routes';
+import routes from '../routes/routes';
 
 function mapStateToProps(state) {
   return {
@@ -66,6 +66,7 @@ class BackendLayout extends React.Component {
                                 : (null);
                             })
                         }
+                        <Redirect from="/admin" to="/admin/dashboard" />
                     </Switch>
                 </Container>
             </main>

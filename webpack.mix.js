@@ -11,5 +11,23 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.react('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+mix
+    .react('resources/assets/js/app.js', 'public/js')
+    .sass('resources/assets/sass/app.scss', 'public/css')
+    .webpackConfig({
+        module: {
+            rules: [
+                {
+                    test: /\.scss$/,
+                    loader: 'sass-loader'
+                },
+                {
+                    test: /\.css$/,
+                    loader: 'style-loader!css-loader'
+                }
+            ]
+        }
+    })
+    .options({
+        processCssUrls: false
+    });

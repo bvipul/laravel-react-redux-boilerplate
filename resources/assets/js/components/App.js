@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
-import { BrowserRouter, Route, Redirect } from 'react-router-dom';
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import { reducer as formReducer } from 'redux-form';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import LandingPage from './LandingPage';
-import Login from './Login';
-import Register from './Register';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
 import BackendLayout from '../Layout/BackendLayout';
 import Errors from './Errors';
-import jwt_decode from 'jwt-decode';
+import PrivateRoute from '../routes/PrivateRoute';
+import store from '../store';
 
 // import './App.css';
 // Styles
@@ -25,60 +24,6 @@ import 'font-awesome/css/font-awesome.min.css';
 import 'simple-line-icons/css/simple-line-icons.css';
 // Import Main styles for this application
 import '../scss/style.css';
-
-function auth(state=[], action) {
-  switch(action.type) {
-    case 'LOGGED_IN':
-      return {
-        user: action.payload
-      };
-    default:
-      return state;
-  }
-}
-
-function errors(state=[], action) {
-  switch(action.type) {
-    case 'LOGIN_FAILED':
-      console.log("payload", action.payload);
-      return [...action.payload];
-    default:
-      return state;
-  }
-}
-
-const rootReducer = combineReducers({
-  form: formReducer,
-  auth,
-  errors
-  // my other reducers come here
-});
-
-const isAuthenticated = () => {
-  
-  if(localStorage.getItem('token'))
-  {
-    let token = jwt_decode(localStorage.getItem('token'));
-
-    if (token.exp > (new Date().getTime() / 1000))
-    {
-      return true;
-    }
-    console.log("has token", token);
-  }
-
-  return false;
-};
-
-const PrivateRoute = ({component: Component, ...rest}) => (
-  <Route {...rest} render={(props) => (
-  isAuthenticated() === true
-    ? <Component {...props} />
-    : <Redirect to='/login' />
-  )} />
-);
-
-const store = createStore(rootReducer, {});
 
 class App extends Component {
   constructor(props) {
@@ -94,7 +39,7 @@ class App extends Component {
               <Route exact path="/" component={LandingPage} />
               <Route path="/login" component={Login} />
               <Route path="/account/create" component={Register} />
-              <PrivateRoute path="/dashboard" component={BackendLayout}/>
+              <PrivateRoute path="/admin" component={BackendLayout}/>
           </div>
         </BrowserRouter>
       </Provider>
