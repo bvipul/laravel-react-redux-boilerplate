@@ -21,7 +21,7 @@ export function authCheck() {
 
 export function errors(payload) {
   return {
-    type: 'LOGIN_FAILED',
+    type: ActionTypes.LOGIN_FAILED,
     payload
   }
 };

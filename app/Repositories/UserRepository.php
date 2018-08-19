@@ -38,5 +38,13 @@ class UserRepository extends BaseRepository
                 'users.updated_at',
                 'users.created_at'
             ]);
-    }      
+    }     
+    
+    public function create($input)
+    {
+        if(User::create($input))
+        {
+            return true;
+        }
+    }
 }

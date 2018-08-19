@@ -67,9 +67,13 @@ class UserController extends ApiController
             return $this->throwValidation($validation->messages()->first());
         }
 
-        $this->repository->create($request);
+        $this->repository->create($request->all());
 
-        return new UserResource(User::orderBy('created_at', 'desc')->first());
+        return $this->respond([
+            'success'   => true,
+            'message'   => "User Created Successfully"
+        ]);
+        // return new UserResource(User::orderBy('created_at', 'desc')->first());
     }
 
     /**
@@ -150,15 +154,13 @@ class UserController extends ApiController
      */
     public function validateUser(Request $request, $action = '', $id = 0)
     {
-        $password = ($action == 'edit') ? '' : 'required|min:6|confirmed';
+        $password = ($action == 'edit') ? '' : 'required|min:6';
 
         $validation = Validator::make($request->all(), [
-            'first_name'      => 'required|max:255',
-            'last_name'       => 'required|max:255',
+            'name'            => 'required|max:255',
             'email'           => 'required|max:255|email|unique:users,email,'.$id,
             'password'        => $password,
-            'assignees_roles' => 'required',
-            'permissions'     => 'required',
+            'is_admin'        => 'required|boolean'
         ]);
 
         return $validation;
