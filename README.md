@@ -8,3 +8,9 @@ A Laravel Application Boilerplate with React and Redux
 
 # Dashboard
 ![Screenshot](screenshots/dashboard.png)
+
+# User Listing
+![Screenshot](screenshots/user_listing.png)
+
+# Create User
+![Screenshot](screenshots/user_create.png)
