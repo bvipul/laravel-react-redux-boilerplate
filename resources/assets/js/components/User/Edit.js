@@ -71,19 +71,14 @@ class Edit extends React.Component {
         super(props);
 
         this.processSubmit = this.processSubmit.bind(this);
-
-        this.state = {
-            name: 'Vipul Basapati'
-        }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         Server
             .get(`/api/users/${this.props.match.params.id}`)
             .then((response) => {
-               this.setState({
-                   user: response.data.data
-               });
+                console.log("response", response);
+                if (response.statusText == 'OK') this.props.initialize(response.data.data);
             })
             .catch((error) => {
                 const { response: { data: { error: { message } } } } = error;
@@ -93,7 +88,7 @@ class Edit extends React.Component {
 
     processSubmit(values) {
         Server
-            .post(`/api/users/`, values)
+            .patch(`/api/users/${this.props.match.params.id}`, values)
             .then((response) => {
                 if (response.data.success) {
                     this.props.errors(new Array());
@@ -109,82 +104,74 @@ class Edit extends React.Component {
     render() {
         const {error, handleSubmit, submitting} = this.props;
 
-        if (!this.state.user) {
-            return (
-                <p style={{display: 'block', textAlign: 'center'}}>Loading....</p>
-            )
-        } else {
-            // Render real UI ...
-            return (
-                <Card>
-                    <CardHeader className="text-center">
-                        <Row>
-                            <Col md={8} className="text-right">
-                                <h1 style={{ display: 'inline-block', textTransform: 'uppercase', letterSpacing: '5px' }}>Edit User</h1>
+        return (
+            <Card>
+                <CardHeader className="text-center">
+                    <Row>
+                        <Col md={8} className="text-right">
+                            <h1 style={{ display: 'inline-block', textTransform: 'uppercase', letterSpacing: '5px' }}>Edit User</h1>
+                        </Col>
+                        <Col md={4} className="text-right">
+                            <Link className="nav-link" to="/admin/user">
+                                <Button color="secondary">
+                                    Cancel
+                                </Button>
+                            </Link>
+                        </Col>
+                    </Row>
+                </CardHeader>
+                <Form onSubmit={handleSubmit(this.processSubmit)}>
+                    <CardBody>
+                        <Field
+                            label="Name"
+                            name="name"
+                            component={FormField}
+                            id="name"
+                            type="name"
+                            className="form-control"
+                        />
+                        <Field
+                            label="Email Address"
+                            name="email"
+                            component={FormField}
+                            id="email"
+                            type="email"
+                            className="form-control"
+                        />
+                        <Field
+                            label="Is Admin ?"
+                            name="is_admin"
+                            component={FormField}
+                            id="is_admin"
+                            type="select"
+                            className="form-control"
+                        >
+                            <option value={''}>Please Select</option>
+                            <option value={1}>Yes</option>
+                            <option value={0}>No</option>
+                        </Field>  
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup row>
+                            <Col sm={{
+                                size: 12,
+                                offset: 5
+                            }}>
+                                <Link className="btn btn-secondary" to="/admin/user">Cancel</Link>
+                                <Button type="submit" className="ml-2" color="success" disabled={submitting}>Update</Button>
                             </Col>
-                            <Col md={4} className="text-right">
-                                <Link className="nav-link" to="/admin/user">
-                                    <Button color="secondary">
-                                        Cancel
-                                    </Button>
-                                </Link>
-                            </Col>
-                        </Row>
-                    </CardHeader>
-                    <Form onSubmit={handleSubmit(this.processSubmit)}>
-                        <CardBody>
-                            <Field
-                                label="Name"
-                                name="name"
-                                component={FormField}
-                                id="name"
-                                type="name"
-                                defaultValue={this.state.user.name}
-                                className="form-control"
-                            />
-                            <Field
-                                label="Email Address"
-                                name="email"
-                                component={FormField}
-                                id="email"
-                                type="email"
-                                className="form-control"
-                            />
-                            <Field
-                                label="Is Admin ?"
-                                name="is_admin"
-                                component={FormField}
-                                id="is_admin"
-                                type="select"
-                                className="form-control"
-                            >
-                                <option value={''}>Please Select</option>
-                                <option value={1}>Yes</option>
-                                <option value={0}>No</option>
-                            </Field>  
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup row>
-                                <Col sm={{
-                                    size: 12,
-                                    offset: 5
-                                }}>
-                                    <Link className="btn btn-secondary" to="/admin/user">Cancel</Link>
-                                    <Button type="submit" className="ml-2" color="success" disabled={submitting}>Submit</Button>
-                                </Col>
-                            </FormGroup>
-                        </CardFooter>
-                    </Form>
-                </Card>
-            );
-        }
+                        </FormGroup>
+                    </CardFooter>
+                </Form>
+            </Card>
+        );
     }
 };
 
 Edit = reduxForm({
   form: 'userEdit',
-  validate: validatorUserEditForm,
-  enableReinitialize: true
+  validate: validatorUserEditForm
+//   enableReinitialize: true
 })(connect(mapStateToProps, mapDispatchToProps)(Edit));
 
 export default Edit;

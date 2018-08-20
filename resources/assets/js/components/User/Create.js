@@ -5,7 +5,7 @@ import { reduxForm, Field } from 'redux-form';
 import FormField from '../FormField';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { authLogin, errors } from '../../store/actions';
+import { errors } from '../../store/actions';
 import Server from '../../Helpers/Server';
 
 const validatorUserCreateForm = (values) => {

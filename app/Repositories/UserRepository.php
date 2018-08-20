@@ -47,4 +47,20 @@ class UserRepository extends BaseRepository
             return true;
         }
     }
+
+    public function update($user, $input)
+    {
+        if($user->update($input))
+        {
+            return true;
+        }
+    }
+
+    public function delete($user)
+    {
+        if($user->delete())
+        {
+            return true;
+        }
+    }
 }

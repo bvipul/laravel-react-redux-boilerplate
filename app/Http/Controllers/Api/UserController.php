@@ -92,11 +92,16 @@ class UserController extends ApiController
             return $this->throwValidation($validation->messages()->first());
         }
 
-        $this->repository->update($user, $request);
+        $this->repository->update($user, $request->all());
 
-        $user = User::findOrfail($user->id);
+        // $user = User::findOrfail($user->id);
 
-        return new UserResource($user);
+        return $this->respond([
+            'success'   => true,
+            'message'   => "User Updated Successfully"
+        ]);
+
+        // return new UserResource($user);
     }
 
     /**
@@ -112,8 +117,9 @@ class UserController extends ApiController
         $this->repository->delete($user);
 
         return $this->respond([
+            'success'   => true,
             'data'      => $user->id,
-            'message'   => trans('alerts.backend.users.deleted'),
+            'message'   => 'User Successfully Deleted!',
         ]);
     }
 

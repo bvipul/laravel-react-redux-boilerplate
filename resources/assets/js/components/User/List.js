@@ -3,7 +3,7 @@ import ReactTable from "react-table";
 import Server from '../../Helpers/Server';
 import { Link } from 'react-router-dom';
 
-import { Badge, Button, ButtonGroup, Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
+import { Badge, Button, ButtonGroup, Card, CardHeader, CardBody, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 import 'react-table/react-table.css';
 
@@ -11,23 +11,47 @@ class List extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.toggle = this.toggle.bind(this);
+
+        this.handleDeleteUser = this.handleDeleteUser.bind(this);
+
         this.state = {
-            data: []
+            data: [],
+            modal: false,
+            currentElement: false
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         Server
         .get('/api/users')
         .then(response => {
             this.setState({
                 data: response.data.data
-            })
-            console.log("response", response);
+            });
         })
         .catch(error => {
             console.log('error', error.response);
         });
+    }
+
+    toggle(id) {
+        const nextState = !this.state.modal;
+
+        this.setState({
+            modal: nextState,
+            currentElement: id ? id : false
+        })
+    }
+
+    handleDeleteUser() {
+        Server
+            .delete(`/api/users/${this.state.currentElement}`)
+            .then(response => {
+                this.toggle();
+                this.setState(this.state);
+            });
     }
 
     render() {
@@ -76,7 +100,7 @@ class List extends React.Component {
                         <Link className="btn btn-secondary" to={`/admin/user/${row.row.id}/edit`} title="Edit">
                             <i className="fa fa-pencil" aria-hidden="true"></i>
                         </Link>
-                        <Button title="Delete">
+                        <Button title="Delete" onClick={this.toggle.bind(null, row.row.id)}>
                             <i className="fa fa-trash" aria-hidden="true"></i>
                         </Button>
                     </ButtonGroup>
@@ -109,6 +133,16 @@ class List extends React.Component {
                         />
                     </CardBody>
                 </Card>
+                <Modal isOpen={this.state.modal} toggle={this.toggle}>
+                    <ModalHeader toggle={this.toggle}>Delete</ModalHeader>
+                    <ModalBody>
+                        Are you sure you want to delete this?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="danger" onClick={this.handleDeleteUser}>Delete</Button>{' '}
+                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
             </React.Fragment>
         );
     }

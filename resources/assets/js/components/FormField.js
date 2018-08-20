@@ -10,8 +10,6 @@ const FormField = ({
         defaultValue,
         meta: { touched, error, warning }
 }) => {
-    console.log("input", input, defaultValue);
-    
     let renderedInput;
     if (type == 'select') {
         renderedInput = (<select {...input} name={name} className={
