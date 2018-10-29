@@ -13,8 +13,8 @@ class List extends React.Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-
         this.handleDeleteUser = this.handleDeleteUser.bind(this);
+        this.removeUserFromState = this.removeUserFromState.bind(this);
 
         this.state = {
             data: [],
@@ -45,17 +45,33 @@ class List extends React.Component {
         })
     }
 
+    removeUserFromState(id) {
+        let users = this.state.data.slice();
+        
+        let userIndex = users.findIndex(user => {
+            return user.id === id;
+        });
+        
+        if(userIndex && userIndex >= 0) {
+            users = [
+                ...users.slice(0, userIndex),
+                ...users.slice(userIndex + 1)
+            ];
+        }
+
+        this.setState({data:users});
+    }
+
     handleDeleteUser() {
         Server
             .delete(`/api/users/${this.state.currentElement}`)
             .then(response => {
+                this.removeUserFromState(this.state.currentElement);
                 this.toggle();
-                this.setState(this.state);
             });
     }
 
     render() {
-
         const columns = [
             {
                 Header:  () => <b>Id</b>,
@@ -106,7 +122,8 @@ class List extends React.Component {
                     </ButtonGroup>
                 )
             }
-        ]
+        ];
+
         return (
             <React.Fragment>
                 <Card>
